@@ -3,3 +3,4 @@
 *.ipynb_checkpoints
 *.hdf5
 /Segmentation/u-net model/*
+*.pickle
