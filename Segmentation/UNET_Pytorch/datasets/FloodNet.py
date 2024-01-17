@@ -1,121 +1,43 @@
 import os
-import torch
-import shutil
+import glob
+import cv2
 import numpy as np
-
-from PIL import Image
 from tqdm import tqdm
-from urllib.request import urlretrieve
+from torch.utils.data import Dataset
 
-
-class FloodNetDataset(torch.utils.data.Dataset):
-    def __init__(self, root, mode="train", transform=None):
-
-        assert mode in {"train", "valid", "test"}
-
-        self.root = root
-        self.mode = mode
+class FloodNetDataset(Dataset):
+    def __init__(self, root_directory, split='train', transform=None, IMAGE_SHAPE=(128, 128, 3)):
+        self.root = root_directory
+        self.split = split
         self.transform = transform
+        self.SIZE_X = IMAGE_SHAPE[0]
+        self.SIZE_Y = IMAGE_SHAPE[1]
+        self.CHANNELS = IMAGE_SHAPE[2]
 
-        self.images_directory = os.path.join(self.root, f"{mode}-org-img")
-        self.masks_directory = os.path.join(self.root, f"{mode}-label-img")
+        self.images_directory = os.path.join(self.root, split, f"{split}-org-img")
 
-        self.filenames = self._read_split() 
+        self.filenames = os.listdir(self.images_directory)
 
     def __len__(self):
         return len(self.filenames)
 
     def __getitem__(self, idx):
+        image_path = os.path.join(self.root, self.split, f"{self.split}-org-img", self.filenames[idx])
+        image, mask = self.load_image_and_mask(image_path, self.SIZE_X, self.SIZE_Y)
 
-        filename = self.filenames[idx]
-        image_path = os.path.join(self.images_directory, filename + ".jpg")
-        mask_path = os.path.join(self.masks_directory, filename + ".png")
+        sample = {'image': image, 'mask': mask}
 
-        image = np.array(Image.open(image_path).convert("RGB"))
-
-        trimap = np.array(Image.open(mask_path))
-        mask = self._preprocess_mask(trimap)
-
-        sample = dict(image=image, mask=mask, trimap=trimap)
-        if self.transform is not None:
-            sample = self.transform(**sample)
+        if self.transform:
+            sample = self.transform(sample)
 
         return sample
 
-    @staticmethod
-    def _preprocess_mask(mask):
-        mask = mask.astype(np.float32)
-        mask[mask == 2.0] = 0.0
-        mask[(mask == 1.0) | (mask == 3.0)] = 1.0
-        return mask
+    def load_image_and_mask(self, image_path, size_x, size_y):
+        img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        img = cv2.resize(img, (size_x, size_y))
 
-    def _read_split(self):
-        
+        mask_path = (image_path.replace('org', 'label')).replace('jpg', 'png')
+        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        mask = cv2.resize(mask, (size_x, size_y))
 
-    @staticmethod
-    def download(root):
-
-        # load images
-        filepath = os.path.join(root, "images.tar.gz")
-        download_url(
-            url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz",
-            filepath=filepath,
-        )
-        extract_archive(filepath)
-
-        # load annotations
-        filepath = os.path.join(root, "annotations.tar.gz")
-        download_url(
-            url="https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz",
-            filepath=filepath,
-        )
-        extract_archive(filepath)
-
-
-class SimpleOxfordPetDataset(OxfordPetDataset):
-    def __getitem__(self, *args, **kwargs):
-
-        sample = super().__getitem__(*args, **kwargs)
-
-        # resize images
-        image = np.array(Image.fromarray(sample["image"]).resize((256, 256), Image.LINEAR))
-        mask = np.array(Image.fromarray(sample["mask"]).resize((256, 256), Image.NEAREST))
-        trimap = np.array(Image.fromarray(sample["trimap"]).resize((256, 256), Image.NEAREST))
-
-        # convert to other format HWC -> CHW
-        sample["image"] = np.moveaxis(image, -1, 0)
-        sample["mask"] = np.expand_dims(mask, 0)
-        sample["trimap"] = np.expand_dims(trimap, 0)
-
-        return sample
-
-
-class TqdmUpTo(tqdm):
-    def update_to(self, b=1, bsize=1, tsize=None):
-        if tsize is not None:
-            self.total = tsize
-        self.update(b * bsize - self.n)
-
-
-def download_url(url, filepath):
-    directory = os.path.dirname(os.path.abspath(filepath))
-    os.makedirs(directory, exist_ok=True)
-    if os.path.exists(filepath):
-        return
-
-    with TqdmUpTo(
-        unit="B",
-        unit_scale=True,
-        unit_divisor=1024,
-        miniters=1,
-        desc=os.path.basename(filepath),
-    ) as t:
-        urlretrieve(url, filename=filepath, reporthook=t.update_to, data=None)
-        t.total = t.n
-
-
-def extract_archive(filepath):
-    extract_dir = os.path.dirname(os.path.abspath(filepath))
-    dst_dir = os.path.splitext(filepath)[0]
-    if not os.path.exists(dst_dir):
-        shutil.unpack_archive(filepath, extract_dir)
+        return img, mask
