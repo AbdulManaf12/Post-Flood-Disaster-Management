@@ -37,7 +37,7 @@ class FloodNetDataset(Dataset):
         img = cv2.resize(img, (size_x, size_y))
 
         mask_path = (image_path.replace('org', 'label')).replace('jpg', 'png')
-        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        mask = cv2.imread(mask_path, cv2.IMREAD_COLOR)
         mask = cv2.resize(mask, (size_x, size_y))
 
         return img, mask

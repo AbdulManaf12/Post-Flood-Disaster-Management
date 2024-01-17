@@ -4,3 +4,5 @@
 *.hdf5
 /Segmentation/u-net model/*
 *.pickle
+/Segmentation/UNET_Pytorch/lightning_logs/*
+/Segmentation/UNET_Pytorch/__pycache__/*
