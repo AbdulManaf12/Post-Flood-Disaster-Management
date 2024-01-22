@@ -6,3 +6,4 @@
 *.pickle
 /Segmentation/UNET_Pytorch/lightning_logs/*
 /Segmentation/UNET_Pytorch/__pycache__/*
+*.pyc
