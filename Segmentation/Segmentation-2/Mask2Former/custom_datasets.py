@@ -95,8 +95,10 @@ class SegmentationDataset(Dataset):
     def __getitem__(self, index):
         image = cv2.imread(self.image_paths[index], cv2.IMREAD_COLOR)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype('uint8')
-        mask = cv2.imread(self.mask_paths[index], cv2.IMREAD_COLOR)
-        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB).astype('float32')
+        # mask = cv2.imread(self.mask_paths[index], cv2.IMREAD_COLOR)
+        # mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB).astype('float32')
+
+        mask = cv2.imread(self.mask_paths[index], cv2.IMREAD_GRAYSCALE)
 
         transformed = self.tfms(image=image, mask=mask)
         image = transformed['image']
@@ -105,7 +107,7 @@ class SegmentationDataset(Dataset):
         mask = transformed['mask']
         
         # Get 2D label mask.
-        mask = get_label_mask(mask, self.class_values, self.label_colors_list)
+        # mask = get_label_mask(mask, self.class_values, self.label_colors_list)
         orig_mask = mask.copy()
         
         return image, mask, orig_image, orig_mask

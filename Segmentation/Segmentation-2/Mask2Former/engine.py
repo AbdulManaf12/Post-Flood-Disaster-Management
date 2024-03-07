@@ -23,7 +23,7 @@ def train(
     )
     counter = 0 # to keep track of batch counter
     num_classes = len(classes_to_train)
-
+    
     for i, data in enumerate(prog_bar):
         counter += 1
 

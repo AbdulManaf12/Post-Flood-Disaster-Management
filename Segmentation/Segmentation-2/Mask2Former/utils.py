@@ -19,7 +19,7 @@ def set_class_values(all_classes, classes_to_train):
     :param all_classes: List containing all class names.
     :param classes_to_train: List containing class names to train.
     """
-    class_values = [all_classes.index(cls.lower()) for cls in classes_to_train]
+    class_values = [all_classes.index(cls) for cls in classes_to_train]
     return class_values
 
 def get_label_mask(mask, class_values, label_colors_list):
