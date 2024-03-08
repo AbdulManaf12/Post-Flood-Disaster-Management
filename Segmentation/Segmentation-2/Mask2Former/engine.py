@@ -56,7 +56,7 @@ def train(
         )
 
         metric.add_batch(references=data['orig_mask'], predictions=pred_maps)
-        
+    
     ##### PER EPOCH LOSS #####
     train_loss = train_running_loss / counter
     ##########################
