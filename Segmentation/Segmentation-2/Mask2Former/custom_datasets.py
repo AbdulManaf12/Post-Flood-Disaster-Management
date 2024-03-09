@@ -172,24 +172,36 @@ def get_dataset(
    
     return test_dataset
 
-def get_data_loaders(train_dataset, valid_dataset, batch_size, processor):
+def get_data_loaders(train_dataset, valid_dataset, batch_size, processor, test=False, test_dataset=None):
     collate_func = partial(collate_fn, image_processor=processor)
 
-    train_data_loader = DataLoader(
-        train_dataset, 
-        batch_size=batch_size, 
-        drop_last=False, 
-        num_workers=8,
-        shuffle=True,
-        collate_fn=collate_func
-    )
-    valid_data_loader = DataLoader(
-        valid_dataset, 
-        batch_size=batch_size, 
-        drop_last=False, 
-        num_workers=8,
-        shuffle=False,
-        collate_fn=collate_func
-    )
+    if not test:
+        train_data_loader = DataLoader(
+            train_dataset, 
+            batch_size=batch_size, 
+            drop_last=False, 
+            num_workers=8,
+            shuffle=True,
+            collate_fn=collate_func
+        )
+        valid_data_loader = DataLoader(
+            valid_dataset, 
+            batch_size=batch_size, 
+            drop_last=False, 
+            num_workers=8,
+            shuffle=False,
+            collate_fn=collate_func
+        )
 
-    return train_data_loader, valid_data_loader
+        return train_data_loader, valid_data_loader
+    else:
+        test_data_loader = DataLoader(
+            test_dataset, 
+            batch_size=batch_size, 
+            drop_last=False, 
+            num_workers=8,
+            shuffle=False,
+            collate_fn=collate_func
+        )
+
+        return test_data_loader

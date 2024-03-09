@@ -64,12 +64,13 @@ if __name__ == '__main__':
         test_mask_paths=test_masks,
     )
 
-    test_dataloader = torch.utils.data.DataLoader(
-        test_dataset,
-        batch_size=args.batch,
-        shuffle=False,
-        num_workers=4,
-        pin_memory=True
+    test_dataloader = get_data_loaders(
+        None, 
+        None,
+        args.batch,
+        processor,
+        test=True,
+        test_dataset=test_dataset
     )
 
     metric = evaluate.load("mean_iou")
