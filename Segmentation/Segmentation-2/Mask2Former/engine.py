@@ -88,7 +88,7 @@ def validate(
         counter = 0 # To keep track of batch counter.
         for i, data in enumerate(prog_bar):
             counter += 1
-
+            print(data)
             pixel_values = data['pixel_values'].to(device)
             mask_labels = [mask_label.to(device) for mask_label in data['mask_labels']]
             class_labels = [class_label.to(device) for class_label in data['class_labels']]
