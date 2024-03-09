@@ -77,7 +77,7 @@ if __name__ == '__main__':
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
 
     train_images, train_masks, valid_images, valid_masks = get_images(
-        root_path='input/road_seg'    
+        root_path='input/road_seg'  
     )
 
     train_dataset, valid_dataset = get_dataset(

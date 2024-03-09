@@ -10,17 +10,25 @@ from functools import partial
 ADE_MEAN = np.array([123.675, 116.280, 103.530]) / 255
 ADE_STD = np.array([58.395, 57.120, 57.375]) / 255
 
-def get_images(root_path):
-    train_images = glob.glob(f"{root_path}/train/images/*")
-    train_images.sort()
-    train_masks = glob.glob(f"{root_path}/train/masks/*")
-    train_masks.sort()
-    valid_images = glob.glob(f"{root_path}/valid/images/*")
-    valid_images.sort()
-    valid_masks = glob.glob(f"{root_path}/valid/masks/*")
-    valid_masks.sort()
+def get_images(root_path, test=False):
+    if not test:
+        train_images = glob.glob(f"{root_path}/train/images/*")
+        train_images.sort()
+        train_masks = glob.glob(f"{root_path}/train/masks/*")
+        train_masks.sort()
+        valid_images = glob.glob(f"{root_path}/valid/images/*")
+        valid_images.sort()
+        valid_masks = glob.glob(f"{root_path}/valid/masks/*")
+        valid_masks.sort()
+        
+        return train_images, train_masks, valid_images, valid_masks
+    else:
+        test_images = glob.glob(f"{root_path}/test/images/*")
+        test_images.sort()
+        test_masks = glob.glob(f"{root_path}/test/masks/*")
+        test_masks.sort()
 
-    return train_images, train_masks, valid_images, valid_masks
+        return test_images, test_masks
 
 def train_transforms(img_size):
     """
@@ -121,30 +129,48 @@ def get_dataset(
     classes_to_train,
     label_colors_list,
     img_size,
-    feature_extractor
+    feature_extractor,
+    test=False,
+    test_image_paths=None,
+    test_mask_paths=None
 ):
-    train_tfms = train_transforms(img_size)
-    valid_tfms = valid_transforms(img_size)
+    if not test:
+        train_tfms = train_transforms(img_size)
+        valid_tfms = valid_transforms(img_size)
 
-    train_dataset = SegmentationDataset(
-        train_image_paths,
-        train_mask_paths,
-        train_tfms,
-        label_colors_list,
-        classes_to_train,
-        all_classes, 
-        feature_extractor
-    )
-    valid_dataset = SegmentationDataset(
-        valid_image_paths,
-        valid_mask_paths,
-        valid_tfms,
-        label_colors_list,
-        classes_to_train,
-        all_classes,
-        feature_extractor
-    )
-    return train_dataset, valid_dataset
+        train_dataset = SegmentationDataset(
+            train_image_paths,
+            train_mask_paths,
+            train_tfms,
+            label_colors_list,
+            classes_to_train,
+            all_classes, 
+            feature_extractor
+        )
+        valid_dataset = SegmentationDataset(
+            valid_image_paths,
+            valid_mask_paths,
+            valid_tfms,
+            label_colors_list,
+            classes_to_train,
+            all_classes,
+            feature_extractor
+        )
+        return train_dataset, valid_dataset
+    else:
+        test_tfms = valid_transforms(img_size)
+    
+        test_dataset = SegmentationDataset(
+            test_image_paths,
+            test_mask_paths,
+            test_tfms,
+            label_colors_list,
+            classes_to_train,
+            all_classes, 
+            feature_extractor
+        )
+   
+    return test_dataset
 
 def get_data_loaders(train_dataset, valid_dataset, batch_size, processor):
     collate_func = partial(collate_fn, image_processor=processor)

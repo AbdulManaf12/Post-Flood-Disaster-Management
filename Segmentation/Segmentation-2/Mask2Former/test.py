@@ -3,6 +3,10 @@ import os
 import argparse
 import evaluate
 
+from transformers import (
+    Mask2FormerForUniversalSegmentation, Mask2FormerImageProcessor
+)
+
 from custom_datasets import get_images, get_dataset, get_data_loaders
 from model import load_model
 from config import ALL_CLASSES, LABEL_COLORS_LIST
@@ -31,7 +35,7 @@ parser.add_argument(
 )
 parser.add_argument(
     '--model',
-    default='outputs/model_iou' 
+    default='outputs/final_model/' 
 )
 args = parser.parse_args()
 print(args)
@@ -39,24 +43,25 @@ print(args)
 if __name__ == '__main__':
     # Load the model
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    model, processor = load_model(num_classes=len(ALL_CLASSES))
-    model.load_state_dict(torch.load(args.model))  # Load the trained model
-    model = model.to(device)
-    model.eval()
-
+    processor = Mask2FormerImageProcessor()
+    model = Mask2FormerForUniversalSegmentation.from_pretrained(args.model) 
+    model.to(device).eval()
+    
     # Load test dataset
-    test_images, test_masks = get_images(root_path='input/road_seg/test')
+    test_images, test_masks = get_images(root_path='input/road_seg', test=True)
     test_dataset = get_dataset(
-        test_images, 
-        test_masks,
-        test_images,  # Assuming no labels for test set
-        test_masks,   # Assuming no labels for test set
+        None,
+        None,  # Assuming no labels for test set
+        None,
+        None,   # Assuming no labels for test set
         ALL_CLASSES,
         ALL_CLASSES,
         LABEL_COLORS_LIST,
         img_size=args.imgsz,
         feature_extractor=processor,
-        mode='test'
+        test=True,
+        test_image_paths=test_images, 
+        test_mask_paths=test_masks,
     )
 
     test_dataloader = torch.utils.data.DataLoader(
@@ -84,5 +89,3 @@ if __name__ == '__main__':
     print(f"Test mIOU: {test_miou:.4f}")
     print('TESTING COMPLETE')
 
-
-#!python test.py --batch 16 --imgsz 320 320 --model outputs/model_iou
