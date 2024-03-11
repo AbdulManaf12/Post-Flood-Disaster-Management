@@ -1,5 +1,4 @@
 import torch
-import os
 import argparse
 import evaluate
 
@@ -11,13 +10,6 @@ from custom_datasets import get_images, get_dataset, get_data_loaders
 from model import load_model
 from config import ALL_CLASSES, LABEL_COLORS_LIST
 from engine import validate
-from utils import SaveBestModelIOU
-
-seed = 42
-torch.manual_seed(seed)
-torch.cuda.manual_seed(seed)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = True
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -41,19 +33,17 @@ args = parser.parse_args()
 print(args)
 
 if __name__ == '__main__':
-    # Load the model
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     processor = Mask2FormerImageProcessor()
     model = Mask2FormerForUniversalSegmentation.from_pretrained(args.model) 
     model.to(device).eval()
     
-    # Load test dataset
     test_images, test_masks = get_images(root_path='input/road_seg', test=True)
     test_dataset = get_dataset(
         None,
-        None,  # Assuming no labels for test set
+        None, 
         None,
-        None,   # Assuming no labels for test set
+        None,   
         ALL_CLASSES,
         ALL_CLASSES,
         LABEL_COLORS_LIST,
@@ -73,6 +63,16 @@ if __name__ == '__main__':
         test_dataset=test_dataset
     )
 
+    for batch_idx, (images, masks) in enumerate(test_dataloader):
+        print(f"Batch {batch_idx}:")
+        print("Images shape:", images.shape)
+        print("Masks shape:", masks.shape)
+        if batch_idx == 0:
+            print("First image:", images[0])
+            print("First mask:", masks[0])
+        if batch_idx == 2:
+            break
+
     metric = evaluate.load("mean_iou")
 
     # Testing
@@ -82,8 +82,8 @@ if __name__ == '__main__':
         device,
         ALL_CLASSES,
         LABEL_COLORS_LIST,
-        0,  # Epoch number doesn't matter for testing
-        save_dir=None,  # No need to save predictions during testing
+        0, 
+        save_dir=None,
         processor=processor,
         metric=metric
     )
