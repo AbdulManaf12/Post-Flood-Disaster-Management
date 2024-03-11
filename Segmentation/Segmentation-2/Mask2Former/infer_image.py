@@ -12,12 +12,14 @@ import argparse
 import cv2
 import os
 import glob
+from tqdm import tqdm
+from utils import invert_color_mapping
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
     '--input',
     help='path to the input image directory',
-    default='input/inference_data/images'
+    default='E:/Post-Flood-Disaster-Management/Segmentation/Segmentation-2/Mask2Former/input/road_seg/test/images'
 )
 parser.add_argument(
     '--device',
@@ -33,7 +35,7 @@ parser.add_argument(
 )
 parser.add_argument(
     '--model',
-    default='outputs/model_iou'
+    default='outputs/final_model/'
 )
 args = parser.parse_args()
 
@@ -45,7 +47,9 @@ model = Mask2FormerForUniversalSegmentation.from_pretrained(args.model)
 model.to(args.device).eval()
 
 image_paths = glob.glob(os.path.join(args.input, '*'))
-for image_path in image_paths:
+
+
+for image_path in tqdm(image_paths):
     image = cv2.imread(image_path)
     if args.imgsz is not None:
         image = cv2.resize(image, (args.imgsz[0], args.imgsz[1]))
@@ -59,10 +63,7 @@ for image_path in image_paths:
         labels.cpu(), LABEL_COLORS_LIST
     )
     outputs = image_overlay(image, seg_map)
-    cv2.imshow('Image', outputs)
-    cv2.waitKey(1)
-    
-    # Save path.
+
     image_name = image_path.split(os.path.sep)[-1]
     save_path = os.path.join(
         out_dir, image_name

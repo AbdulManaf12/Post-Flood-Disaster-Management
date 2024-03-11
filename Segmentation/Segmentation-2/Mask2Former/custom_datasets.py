@@ -65,7 +65,7 @@ def collate_fn(batch, image_processor):
     batch = image_processor(
         images,
         segmentation_maps=segmentation_maps,
-        return_tensors='pt',
+        return_tensors='pt',    
         do_resize=False,
         do_rescale=False,
         do_normalize=False

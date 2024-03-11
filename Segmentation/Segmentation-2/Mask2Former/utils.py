@@ -227,3 +227,42 @@ def image_overlay(image, segmented_image):
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     cv2.addWeighted(image, alpha, segmented_image, beta, gamma, image)
     return image
+
+def invert_color_mapping(converted_image, color_mapping):
+    """
+    Invert a converted image back to the original labels.
+
+    Parameters:
+        converted_image (numpy.ndarray): Converted image.
+        color_mapping (dict): Dictionary containing color mappings.
+
+    Returns:
+        numpy.ndarray: Inverted image.
+    """
+    inverted_image = np.zeros(converted_image.shape[:2], dtype=np.uint8)
+
+    for label, color in color_mapping.items():
+        mask = np.all(converted_image == color, axis=-1)
+        inverted_image[mask] = label
+
+    return inverted_image
+
+
+def convert_color_mapping_image(image, color_mapping):
+    """
+    Convert an image using specified color mapping.
+
+    Parameters:
+        image (numpy.ndarray): Input image.
+        color_mapping (dict): Dictionary containing color mappings.
+
+    Returns:
+        numpy.ndarray: Converted image.
+    """
+    converted_image = np.zeros((*image.shape, 3), dtype=np.uint8)
+
+    for label, color in color_mapping.items():
+        mask = (image == label)
+        converted_image[mask] = color
+
+    return converted_image

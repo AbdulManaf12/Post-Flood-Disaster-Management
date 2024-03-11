@@ -34,7 +34,7 @@ print(args)
 
 if __name__ == '__main__':
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    processor = Mask2FormerImageProcessor()
+    processor = Mask2FormerImageProcessor(ignore_index=255, reduce_labels=True)
     model = Mask2FormerForUniversalSegmentation.from_pretrained(args.model) 
     model.to(device).eval()
     
@@ -62,16 +62,6 @@ if __name__ == '__main__':
         test=True,
         test_dataset=test_dataset
     )
-
-    for batch_idx, (images, masks) in enumerate(test_dataloader):
-        print(f"Batch {batch_idx}:")
-        print("Images shape:", images.shape)
-        print("Masks shape:", masks.shape)
-        if batch_idx == 0:
-            print("First image:", images[0])
-            print("First mask:", masks[0])
-        if batch_idx == 2:
-            break
 
     metric = evaluate.load("mean_iou")
 
