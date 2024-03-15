@@ -1,5 +1,4 @@
 ALL_CLASSES = [
-    'Background', 
     'Building-flooded', 
     'Building-non-flooded', 
     'Road-flooded', 
@@ -12,7 +11,6 @@ ALL_CLASSES = [
 ]
 
 LABEL_COLORS_LIST = [
-    [0, 0, 0],
     [196, 0, 0],
     [255, 128, 128],
     [128, 128, 0],
@@ -25,7 +23,6 @@ LABEL_COLORS_LIST = [
 ]
 
 VIS_LABEL_MAP = [
-    [0, 0, 0],
     [196, 0, 0],
     [255, 128, 128],
     [128, 128, 0],

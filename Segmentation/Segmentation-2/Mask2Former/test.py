@@ -84,8 +84,8 @@ if __name__ == '__main__':
         per_class_iou=True
     )
     print('IOU Each Class: ')
-    for i in range(0, 9):
-        print(f'{ALL_CLASSES[i+1]}: {class_wise_iou[i]}')
+    for i in range(0, len(ALL_CLASSES)):
+        print(f'{ALL_CLASSES[i]}: {class_wise_iou[i]}')
 
     print(f"\nTest mIOU: {test_miou:.4f}")
     print('TESTING COMPLETE')
