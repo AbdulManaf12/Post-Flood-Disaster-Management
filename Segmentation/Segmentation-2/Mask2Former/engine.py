@@ -3,8 +3,6 @@ import torch.nn.functional as F
 
 from tqdm import tqdm
 from utils import draw_translucent_seg_maps
-from collections import defaultdict
-import numpy as np
 
 def train(
     model,
@@ -74,7 +72,8 @@ def validate(
     epoch,
     save_dir,
     processor,
-    metric
+    metric,
+    per_class_iou=False
 ):
     print('Validating')
     model.eval()
@@ -128,86 +127,10 @@ def validate(
     ##### PER EPOCH LOSS #####
     valid_loss = valid_running_loss / counter
     ##########################
-    iou = metric.compute(num_labels=num_classes, ignore_index=255, reduce_labels=True)['mean_iou']
+    results = metric.compute(num_labels=num_classes, ignore_index=255, reduce_labels=True)
+    iou = results['mean_iou']
+    if per_class_iou:
+        perclass_iou = results['per_category_iou']
+        return valid_loss, iou, perclass_iou
+
     return valid_loss, iou
-
-def validate_each_class(
-    model,
-    valid_dataloader,
-    device,
-    classes_to_train,
-    label_colors_list,
-    epoch,
-    save_dir,
-    processor,
-    metric
-):
-    print('Validating')
-    model.eval()
-    valid_running_loss = 0.0
-    num_classes = len(classes_to_train)
-
-    class_intersection = defaultdict(float)
-    class_union = defaultdict(float)
-
-    with torch.no_grad():
-        prog_bar = tqdm(
-            valid_dataloader, 
-            total=(len(valid_dataloader)), 
-            bar_format='{l_bar}{bar:20}{r_bar}{bar:-20b}'
-        )
-        counter = 0 # To keep track of batch counter.
-        for i, data in enumerate(prog_bar):
-            counter += 1
-            pixel_values = data['pixel_values'].to(device)
-            mask_labels = [mask_label.to(device) for mask_label in data['mask_labels']]
-            class_labels = [class_label.to(device) for class_label in data['class_labels']]
-            pixel_mask = data['pixel_mask'].to(device)
-
-            outputs = model(
-                pixel_values=pixel_values, 
-                mask_labels=mask_labels,
-                class_labels=class_labels,
-                pixel_mask=pixel_mask
-            )
-
-            target_sizes = [(image.shape[0], image.shape[1]) for image in data['orig_image']]
-            pred_maps = processor.post_process_semantic_segmentation(
-                outputs, target_sizes=target_sizes
-            )
-                
-            # Save the validation segmentation maps.
-            if i == 0:
-                draw_translucent_seg_maps(
-                    pixel_values, 
-                    pred_maps, 
-                    epoch, 
-                    i, 
-                    save_dir, 
-                    label_colors_list,
-                )
-
-            ##### BATCH-WISE LOSS #####
-            loss = outputs.loss
-            valid_running_loss += loss.item()
-            ###########################
-
-            # Calculate IoU for each class
-            for cls in range(num_classes):
-                class_intersection[cls] += np.logical_and(pred_maps == cls, data['orig_mask'] == cls).sum()
-                class_union[cls] += np.logical_or(pred_maps == cls, data['orig_mask'] == cls).sum()
-        
-    ##### PER EPOCH LOSS #####
-    valid_loss = valid_running_loss / counter
-    ##########################
-    
-    # Calculate mIoU and class-wise IoU
-    class_iou = {}
-    for cls in range(num_classes):
-        if class_union[cls] == 0:
-            class_iou[cls] = 0  # Set IoU to 0 if union is 0 to avoid division by zero
-        else:
-            class_iou[cls] = class_intersection[cls] / class_union[cls]
-    mIoU = sum(class_iou.values()) / num_classes
-    
-    return valid_loss, mIoU, class_iou

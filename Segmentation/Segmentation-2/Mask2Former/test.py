@@ -9,7 +9,7 @@ from transformers import (
 from custom_datasets import get_images, get_dataset, get_data_loaders
 from model import load_model
 from config import ALL_CLASSES, LABEL_COLORS_LIST
-from engine import validate, validate_each_class
+from engine import validate
 
 seed = 42
 torch.manual_seed(seed)
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     metric = evaluate.load("mean_iou")
 
     # Testing
-    test_loss, test_miou = validate(
+    test_loss, test_miou, class_wise_iou = validate(
         model,
         test_dataloader,
         device,
@@ -80,8 +80,13 @@ if __name__ == '__main__':
         0, 
         save_dir=None,
         processor=processor,
-        metric=metric
+        metric=metric,
+        per_class_iou=True
     )
-    print(f"Test mIOU: {test_miou:.4f}")
+    print('IOU Each Class: ')
+    for i in range(0, 9):
+        print(f'{ALL_CLASSES[i+1]}: {class_wise_iou[i]}')
+
+    print(f"\nTest mIOU: {test_miou:.4f}")
     print('TESTING COMPLETE')
 
