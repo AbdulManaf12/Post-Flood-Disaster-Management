@@ -8,5 +8,4 @@
 /Segmentation/UNET_Pytorch/__pycache__/*
 *.pyc
 Segmentation/Segmentation-2/Mask2Former/input/*
-Segmentation/Segmentation-2/Mask2Former/outputs/*/*
-Segmentation/Segmentation-2/Mask2Former/outputs1/*/*
+Segmentation/Segmentation-2/Mask2Former/outputs*/*/*
