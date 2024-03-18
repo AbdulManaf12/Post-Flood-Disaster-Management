@@ -62,10 +62,13 @@ for image_path in tqdm(image_paths):
     seg_map = draw_segmentation_map(
         labels.cpu(), LABEL_COLORS_LIST
     )
-    outputs = image_overlay(image, seg_map)
+
+    ### manaf changes if you want to put mask + image together with certain transparency you may explore it
+    # outputs = image_overlay(image, seg_map)
 
     image_name = image_path.split(os.path.sep)[-1]
     save_path = os.path.join(
         out_dir, image_name
     )
-    cv2.imwrite(save_path, outputs)
+    # cv2.imwrite(save_path, outputs)
+    cv2.imwrite(save_path, seg_map)
