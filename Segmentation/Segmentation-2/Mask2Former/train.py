@@ -43,6 +43,12 @@ parser.add_argument(
     help='width, height'
 )
 parser.add_argument(
+    '--backbone', 
+    default=['facebook/mask2former-swin-tiny-ade-semantic'],
+    type=str,
+    help='visit this https://huggingface.co/facebook and find appropriate backbone'
+)
+parser.add_argument(
     '--scheduler',
     action='store_true',
 )
@@ -64,7 +70,7 @@ if __name__ == '__main__':
     os.makedirs(out_dir_valid_preds, exist_ok=True)
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    model, processor = load_model(num_classes=len(ALL_CLASSES))
+    model, processor = load_model(backbone=args.backbone, num_classes=len(ALL_CLASSES))
     model = model.to(device)
     print(model)
     # Total parameters and trainable parameters.
