@@ -2,6 +2,7 @@
 *.h5
 *.ipynb_checkpoints
 *.hdf5
+*.zip
 /Segmentation/u-net model/*
 *.pickle
 /Segmentation/UNET_Pytorch/lightning_logs/*
