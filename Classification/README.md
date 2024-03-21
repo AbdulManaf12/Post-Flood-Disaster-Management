@@ -23,10 +23,10 @@ To run any of the experiments, follow these steps:
 3. Execute `jupyter notebook` file accordingly.
 
 ### Best Model weights
-1. MobileNet trained on Dataset A you can download from here.
 
-2. MobileNet trained on Dataset B you can download from here.
+1. MobileNet trained on Dataset A you can download from [here.](https://github.com/AbdulManaf12/Post-Flood-Disaster-Management/releases/download/v.1.0/A_MobileNet.hdf5)
 
+2. MobileNet trained on Dataset B you can download from [here.](https://github.com/AbdulManaf12/Post-Flood-Disaster-Management/releases/download/v.1.0/B_MobileNet.hdf5)
 
 ### Contact
 
