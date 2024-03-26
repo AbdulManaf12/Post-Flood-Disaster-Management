@@ -165,12 +165,12 @@ if __name__ == '__main__':
             scheduler.step()
         print('-' * 50)
 
-    # Save the loss and accuracy plots.
-    save_plots(
-        train_loss, valid_loss,
-        train_miou, valid_miou, 
-        out_dir
-    )
+        # Save the loss and accuracy plots.
+        save_plots(
+            train_loss, valid_loss,
+            train_miou, valid_miou, 
+            out_dir
+        )
     # Save final model.
     save_model(model, out_dir, name='final_model')
     print('TRAINING COMPLETE')
