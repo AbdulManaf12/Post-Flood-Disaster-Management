@@ -86,6 +86,11 @@ if __name__ == '__main__':
         root_path='input/road_seg'  
     )
 
+    # print(f"Train Images: {len(train_images)}")
+    # print(f"Train Masks: {len(train_masks)}")
+    # print(f"Valid Images: {len(valid_images)}")
+    # print(f"Valid Masks: {len(valid_masks)}")
+
     train_dataset, valid_dataset = get_dataset(
         train_images, 
         train_masks,
