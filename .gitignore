@@ -10,3 +10,4 @@
 *.pyc
 Segmentation/Segmentation-2/Mask2Former/input/*
 Segmentation/Segmentation-2/Mask2Former/outputs*/*/*
+*.pth
