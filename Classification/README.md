@@ -5,6 +5,8 @@
 ### Abstract
 Providing timely assistance to flood-affected regions is a critical challenge, and leveraging deep learning methodologies has shown great promise in addressing such environmental crises. While several studies have proposed methodologies for classifying flood images, most of them are limited by two key factors: first, models are typically trained on images from specific geographic regions, which restricts their ability to generalize to images with varied features or from other regions; second, many models are trained exclusively on high-resolution images, overlooking the classification of low-resolution images. To address these gaps, we have curated a dataset by combining existing benchmark datasets and acquiring images from web repositories. Our goal is to overcome resolution-related challenges and improve model performance across diverse regions. We conducted a comparative analysis of various deep learning models based on CNN architectures using our curated dataset. Our experimental results demonstrated that MobileNet and Xception outperformed ResNet-50, VGG-16, and InceptionV3, achieving an accuracy rate of approximately 98% and an F1-score of 92% for the flood class. Additionally, we employed Explainable AI (XAI) techniques, specifically Lime, to interpret the model results.
 
+![overall figure](../images/Dataset_and_Methodology.png)
+
 ### Overview
 This directory contains all code related to classification experiments. Each subfolder corresponds to a specific experiment and includes the necessary settings and configurations.
 
