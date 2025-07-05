@@ -300,6 +300,7 @@ Manaf, A., Mughal, N., Talpur, K. R., Talpur, B. A., Mujtaba, G., & Talpur, S. R
 This research is published under IEEE Access open access policy. The code and models are available for academic and research purposes. For commercial applications, please contact the authors.
 
 **Paper DOI**: [10.1109/ACCESS.2025.3543078](https://doi.org/10.1109/ACCESS.2025.3543078)  
+**Paper Homepage**: [https://abdulmanaf.me/Post-Flood-Disaster-Management/Classification/](https://abdulmanaf.me/Post-Flood-Disaster-Management/Classification/)  
 **Repository**: [Post-Flood-Disaster-Management](https://github.com/AbdulManaf12/Post-Flood-Disaster-Management)
 
 ---
